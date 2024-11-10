@@ -1,0 +1,28 @@
+#include <SPI.h>
+#include <WiFiNINA.h>
+
+char ssid[] = "your_network";  
+char pass[] = "your_password";  
+
+int status = WL_IDLE_STATUS;
+
+void setup() {
+  Serial.begin(9600);
+  while (status != WL_CONNECTED) {
+    Serial.print("Connecting to WiFi...");
+    status = WiFi.begin(ssid, pass);
+    delay(10000);
+  }
+  Serial.println("Connected to WiFi");
+}
+
+void loop() {
+  int networks = WiFi.scanNetworks();
+  Serial.println("Scanning WiFi networks...");
+  for (int i = 0; i < networks; i++) {
+    Serial.print(i + 1);
+    Serial.print(": ");
+    Serial.println(WiFi.SSID(i));
+  }
+  delay(5000);
+}

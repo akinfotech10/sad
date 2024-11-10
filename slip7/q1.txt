@@ -1,0 +1,85 @@
+interface Command {
+    void execute();
+    void undo();
+}
+
+class CeilingFan {
+    private String state = "off";
+
+    public void turnOn() {
+        state = "on";
+        System.out.println("Ceiling Fan is ON");
+    }
+
+    public void turnOff() {
+        state = "off";
+        System.out.println("Ceiling Fan is OFF");
+    }
+
+    public String getState() {
+        return state;
+    }
+}
+
+class TurnOnFanCommand implements Command {
+    private CeilingFan fan;
+
+    public TurnOnFanCommand(CeilingFan fan) {
+        this.fan = fan;
+    }
+
+    public void execute() {
+        fan.turnOn();
+    }
+
+    public void undo() {
+        fan.turnOff();
+    }
+}
+
+class TurnOffFanCommand implements Command {
+    private CeilingFan fan;
+
+    public TurnOffFanCommand(CeilingFan fan) {
+        this.fan = fan;
+    }
+
+    public void execute() {
+        fan.turnOff();
+    }
+
+    public void undo() {
+        fan.turnOn();
+    }
+}
+
+class RemoteControl {
+    private Command lastCommand;
+
+    public void pressButton(Command command) {
+        command.execute();
+        lastCommand = command;
+    }
+
+    public void pressUndo() {
+        if (lastCommand != null) {
+            lastCommand.undo();
+        }
+    }
+}
+
+public class UndoCommandPatternExample {
+    public static void main(String[] args) {
+        CeilingFan fan = new CeilingFan();
+        Command turnOnFan = new TurnOnFanCommand(fan);
+        Command turnOffFan = new TurnOffFanCommand(fan);
+
+        RemoteControl remote = new RemoteControl();
+
+        remote.pressButton(turnOnFan);
+        remote.pressUndo();
+
+        remote.pressButton(turnOffFan);
+        remote.pressUndo();
+    }
+}

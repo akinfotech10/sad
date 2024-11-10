@@ -1,0 +1,21 @@
+#define TOUCH_SENSOR_PIN 2
+#define LED_PIN 13
+
+void setup() {
+  pinMode(TOUCH_SENSOR_PIN, INPUT);
+  pinMode(LED_PIN, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int sensorValue = digitalRead(TOUCH_SENSOR_PIN);
+
+  if (sensorValue == HIGH) {
+    Serial.println("Finger detected!");
+    digitalWrite(LED_PIN, HIGH);
+  } else {
+    digitalWrite(LED_PIN, LOW);
+  }
+
+  delay(100);
+}

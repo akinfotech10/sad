@@ -1,0 +1,25 @@
+#include <WiFi.h> // Use <ESP8266WiFi.h> for ESP8266
+
+void setup() {
+  Serial.begin(115200);
+  WiFi.mode(WIFI_STA); // Set Wi-Fi to station mode (client)
+  WiFi.disconnect();   // Disconnect from any previous Wi-Fi connections
+  delay(100);
+  Serial.println("Scanning for Wi-Fi networks...");
+}
+
+void loop() {
+  int numNetworks = WiFi.scanNetworks(); // Start the scan
+
+  Serial.println("Available networks:");
+  for (int i = 0; i < numNetworks; i++) {
+    Serial.print("Network Name (SSID): ");
+    Serial.print(WiFi.SSID(i));
+
+    Serial.print(" | Signal Strength (RSSI): ");
+    Serial.print(WiFi.RSSI(i));
+    Serial.println(" dBm");
+  }
+  
+  delay(10000); // Scan again every 10 seconds
+}

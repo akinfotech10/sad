@@ -1,0 +1,97 @@
+abstract class Pizza {
+    String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void prepare() {
+        System.out.println("Preparing " + name);
+    }
+
+    public void bake() {
+        System.out.println("Baking " + name);
+    }
+
+    public void cut() {
+        System.out.println("Cutting " + name);
+    }
+
+    public void box() {
+        System.out.println("Boxing " + name);
+    }
+
+    public abstract void createPizza();
+}
+
+class NYStyleCheesePizza extends Pizza {
+    public NYStyleCheesePizza() {
+        name = "NY Style Cheese Pizza";
+    }
+
+    @Override
+    public void createPizza() {
+        System.out.println("Creating NY Style Cheese Pizza with thin crust and mozzarella");
+    }
+}
+
+class ChicagoStyleCheesePizza extends Pizza {
+    public ChicagoStyleCheesePizza() {
+        name = "Chicago Style Cheese Pizza";
+    }
+
+    @Override
+    public void createPizza() {
+        System.out.println("Creating Chicago Style Cheese Pizza with deep dish and mozzarella");
+    }
+}
+
+abstract class PizzaStore {
+
+    public Pizza orderPizza(String type) {
+        Pizza pizza;
+        pizza = createPizza(type);
+        pizza.prepare();
+        pizza.bake();
+        pizza.cut();
+        pizza.box();
+        return pizza;
+    }
+
+    protected abstract Pizza createPizza(String type);
+}
+
+class NYPizzaStore extends PizzaStore {
+    @Override
+    protected Pizza createPizza(String type) {
+        Pizza pizza = null;
+        if (type.equals("cheese")) {
+            pizza = new NYStyleCheesePizza();
+        }
+        return pizza;
+    }
+}
+
+class ChicagoPizzaStore extends PizzaStore {
+    @Override
+    protected Pizza createPizza(String type) {
+        Pizza pizza = null;
+        if (type.equals("cheese")) {
+            pizza = new ChicagoStyleCheesePizza();
+        }
+        return pizza;
+    }
+}
+
+public class PizzaStoreTest {
+    public static void main(String[] args) {
+        PizzaStore nyPizzaStore = new NYPizzaStore();
+        PizzaStore chicagoPizzaStore = new ChicagoPizzaStore();
+
+        System.out.println("Ordering a NY Style Pizza:");
+        nyPizzaStore.orderPizza("cheese");
+
+        System.out.println("\nOrdering a Chicago Style Pizza:");
+        chicagoPizzaStore.orderPizza("cheese");
+    }
+}

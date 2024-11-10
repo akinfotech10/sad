@@ -1,0 +1,39 @@
+# Read the input string
+input_string = input("Enter a string: ")
+
+# Count words and characters
+word_count = len(input_string.split())
+char_count = len(input_string.replace(" ", ""))
+
+# Print the results
+print(f"Word Count: {word_count}")
+print(f"Character Count (excluding spaces): {char_count}")
+
+
+import math
+
+# Read the shape type
+shape = input("Enter the shape (rectangle/triangle/circle): ").lower()
+
+if shape == "rectangle":
+    # Read rectangle dimensions
+    length = float(input("Enter the length of the rectangle: "))
+    width = float(input("Enter the width of the rectangle: "))
+    area = length * width
+    print(f"The area of the rectangle is: {area}")
+    
+elif shape == "triangle":
+    # Read triangle dimensions
+    base = float(input("Enter the base of the triangle: "))
+    height = float(input("Enter the height of the triangle: "))
+    area = 0.5 * base * height
+    print(f"The area of the triangle is: {area}")
+    
+elif shape == "circle":
+    # Read radius of the circle
+    radius = float(input("Enter the radius of the circle: "))
+    area = math.pi * radius ** 2
+    print(f"The area of the circle is: {area}")
+    
+else:
+    print("Invalid shape. Please choose either rectangle, triangle, or circle.")

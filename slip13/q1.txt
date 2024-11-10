@@ -1,0 +1,54 @@
+class Volt {
+    private int volts;
+
+    public Volt(int volts) {
+        this.volts = volts;
+    }
+
+    public int getVolts() {
+        return volts;
+    }
+}
+
+class Socket {
+    public Volt getVolt() {
+        return new Volt(120);
+    }
+}
+
+class VoltAdapter extends Socket {
+    private Socket socket;
+
+    public VoltAdapter(Socket socket) {
+        this.socket = socket;
+    }
+
+    public Volt get3Volt() {
+        return convertVolt(3);
+    }
+
+    public Volt get12Volt() {
+        return convertVolt(12);
+    }
+
+    public Volt get120Volt() {
+        return socket.getVolt();
+    }
+
+    private Volt convertVolt(int desiredVolt) {
+        Volt v = socket.getVolt();
+        return new Volt(v.getVolts() / (v.getVolts() / desiredVolt));
+    }
+}
+
+public class AdapterPatternTest {
+    public static void main(String[] args) {
+        Socket socket = new Socket();
+        VoltAdapter voltAdapter = new VoltAdapter(socket);
+
+        System.out.println("Voltage from Socket: " + socket.getVolt().getVolts() + "V");
+        System.out.println("Voltage after 3V Adapter: " + voltAdapter.get3Volt().getVolts() + "V");
+        System.out.println("Voltage after 12V Adapter: " + voltAdapter.get12Volt().getVolts() + "V");
+        System.out.println("Voltage after 120V Adapter: " + voltAdapter.get120Volt().getVolts() + "V");
+    }
+}

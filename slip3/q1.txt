@@ -1,0 +1,74 @@
+import java.util.Observable;
+
+class WeatherStation extends Observable {
+    private float temperature;
+    private float humidity;
+    private float pressure;
+
+    public void setMeasurement(float temperature, float humidity, float pressure) {
+        this.temperature = temperature;
+        this.humidity = humidity;
+        this.pressure = pressure;
+        measurementsChanged();
+    }
+
+    private void measurementsChanged() {
+        setChanged();
+        notifyObservers();
+    }
+
+    public float getTemperature() {
+        return temperature;
+    }
+
+    public float getHumidity() {
+        return humidity;
+    }
+
+    public float getPressure() {
+        return pressure;
+    }
+}
+
+
+
+
+import java.util.Observable;
+import java.util.Observer;
+
+class WeatherDisplay implements Observer {
+    private float temperature;
+    private float humidity;
+    private float pressure;
+
+    @Override
+    public void update(Observable obs, Object arg) {
+        if (obs instanceof WeatherStation) {
+            WeatherStation weatherStation = (WeatherStation) obs;
+            this.temperature = weatherStation.getTemperature();
+            this.humidity = weatherStation.getHumidity();
+            this.pressure = weatherStation.getPressure();
+            display();
+        }
+    }
+
+    private void display() {
+        System.out.println("Temperature: " + temperature + "°C");
+        System.out.println("Humidity: " + humidity + "%");
+        System.out.println("Pressure: " + pressure + " hPa");
+    }
+}
+
+
+public class Main {
+    public static void main(String[] args) {
+        WeatherStation weatherStation = new WeatherStation();
+        WeatherDisplay weatherDisplay = new WeatherDisplay();
+
+        weatherStation.addObserver(weatherDisplay);
+        
+        // Simulate new measurements
+        weatherStation.setMeasurement(25.3f, 65f, 1013.1f);
+        weatherStation.setMeasurement(27.8f, 70f, 1012.5f);
+    }
+}

@@ -1,0 +1,90 @@
+interface FlyBehavior {
+    void fly();
+}
+
+interface QuackBehavior {
+    void quack();
+}
+
+class FlyWithWings implements FlyBehavior {
+    public void fly() {
+        System.out.println("Flying with wings!");
+    }
+}
+
+class FlyNoWay implements FlyBehavior {
+    public void fly() {
+        System.out.println("Can't fly.");
+    }
+}
+
+class Quack implements QuackBehavior {
+    public void quack() {
+        System.out.println("Quack!");
+    }
+}
+
+class MuteQuack implements QuackBehavior {
+    public void quack() {
+        System.out.println("<< Silence >>");
+    }
+}
+
+abstract class Duck {
+    FlyBehavior flyBehavior;
+    QuackBehavior quackBehavior;
+
+    public void performFly() {
+        flyBehavior.fly();
+    }
+
+    public void performQuack() {
+        quackBehavior.quack();
+    }
+
+    public void setFlyBehavior(FlyBehavior fb) {
+        flyBehavior = fb;
+    }
+
+    public void setQuackBehavior(QuackBehavior qb) {
+        quackBehavior = qb;
+    }
+
+    public abstract void display();
+}
+
+class MallardDuck extends Duck {
+    public MallardDuck() {
+        flyBehavior = new FlyWithWings();
+        quackBehavior = new Quack();
+    }
+
+    public void display() {
+        System.out.println("I'm a Mallard Duck!");
+    }
+}
+
+class RubberDuck extends Duck {
+    public RubberDuck() {
+        flyBehavior = new FlyNoWay();
+        quackBehavior = new MuteQuack();
+    }
+
+    public void display() {
+        System.out.println("I'm a Rubber Duck!");
+    }
+}
+
+public class DuckTest {
+    public static void main(String[] args) {
+        Duck mallard = new MallardDuck();
+        mallard.display();
+        mallard.performFly();
+        mallard.performQuack();
+
+        Duck rubberDuck = new RubberDuck();
+        rubberDuck.display();
+        rubberDuck.performFly();
+        rubberDuck.performQuack();
+    }
+}

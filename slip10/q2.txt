@@ -1,0 +1,60 @@
+import time
+from datetime import datetime
+
+# a) Print a name 'n' times using for and while loops
+def print_name_n_times():
+    name = input("Enter your name: ")
+    n = int(input("Enter number of times to print the name: "))
+
+    # Using for loop to print the name 'n' times
+    print("\nUsing for loop:")
+    for _ in range(n):
+        print(name)
+
+    # Using while loop to print the name 'n' times
+    print("\nUsing while loop:")
+    count = 0
+    while count < n:
+        print(name)
+        count += 1
+
+# b) Handle Divided by Zero Exception
+def handle_division_by_zero():
+    try:
+        num1 = int(input("\nEnter the first number for division: "))
+        num2 = int(input("Enter the second number for division: "))
+        result = num1 / num2
+        print(f"Result: {result}")
+    except ZeroDivisionError:
+        print("Error: Cannot divide by zero.")
+    except ValueError:
+        print("Error: Invalid input. Please enter integer values.")
+
+# c) Print current time for 10 times with an interval of 10 seconds
+def print_current_time():
+    print("\nPrinting current time for 10 times with an interval of 10 seconds:")
+    for _ in range(10):
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print(f"Current time: {current_time}")
+        time.sleep(10)
+
+# d) Read a file line by line and print the word count of each line
+def word_count_in_file():
+    file_name = input("\nEnter the file name to read: ")
+    try:
+        with open(file_name, 'r') as file:
+            for line in file:
+                word_count = len(line.split())
+                print(f"Line: {line.strip()} \nWord count: {word_count}\n")
+    except FileNotFoundError:
+        print(f"Error: The file '{file_name}' was not found.")
+
+# Combine all the functions in one main program
+def main():
+    print_name_n_times()
+    handle_division_by_zero()
+    print_current_time()
+    word_count_in_file()
+
+if __name__ == "__main__":
+    main()

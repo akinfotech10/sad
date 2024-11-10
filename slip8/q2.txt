@@ -1,0 +1,19 @@
+ls
+cd /path/to/directory
+touch filename
+mv source destination
+rm filename
+man command
+mkdir directory
+rmdir directory
+tar -cvf archive.tar files
+gzip filename
+cat filename
+more filename
+less filename
+ps
+sudo command
+crontab -e
+chown user:group filename
+chgrp group filename
+ping 8.8.8.8
