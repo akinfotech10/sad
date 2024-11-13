@@ -1,25 +1,28 @@
-#include <WiFi.h> // Use <ESP8266WiFi.h> for ESP8266
+pip install seaborn
+ Write a Python program to prepare Scatter Plot for Iris Dataset. Convert Categorical values in numeric format for a dataset. 
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.datasets import load_iris
+from sklearn.preprocessing import LabelEncoder
 
-void setup() {
-  Serial.begin(115200);
-  WiFi.mode(WIFI_STA); // Set Wi-Fi to station mode (client)
-  WiFi.disconnect();   // Disconnect from any previous Wi-Fi connections
-  delay(100);
-  Serial.println("Scanning for Wi-Fi networks...");
-}
+# Step 1: Load the Iris datasetpip 
+iris = load_iris()
+iris_data = pd.DataFrame(iris.data, columns=iris.feature_names)
+iris_data['species'] = iris.target
 
-void loop() {
-  int numNetworks = WiFi.scanNetworks(); // Start the scan
+# Step 2: Convert categorical 'species' column to numeric using LabelEncoder
+label_encoder = LabelEncoder()
+iris_data['species'] = label_encoder.fit_transform(iris_data['species'])
 
-  Serial.println("Available networks:");
-  for (int i = 0; i < numNetworks; i++) {
-    Serial.print("Network Name (SSID): ");
-    Serial.print(WiFi.SSID(i));
+# Step 3: Scatter Plot (using sepal length and sepal width as an example)
+plt.figure(figsize=(8, 6))
+sns.scatterplot(data=iris_data, x='sepal length (cm)', y='sepal width (cm)', hue='species', palette='Set1', style='species', s=100)
 
-    Serial.print(" | Signal Strength (RSSI): ");
-    Serial.print(WiFi.RSSI(i));
-    Serial.println(" dBm");
-  }
-  
-  delay(10000); // Scan again every 10 seconds
-}
+# Customizing the plot
+plt.title("Scatter Plot of Iris Dataset")
+plt.xlabel('Sepal Length (cm)')
+plt.ylabel('Sepal Width (cm)')
+
+# Display the plot
+plt.show()
