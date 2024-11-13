@@ -1,85 +1,58 @@
-interface Command {
-    void execute();
-    void undo();
-}
+pip install pandas scikit-learn
 
-class CeilingFan {
-    private String state = "off";
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
 
-    public void turnOn() {
-        state = "on";
-        System.out.println("Ceiling Fan is ON");
-    }
+# Step 1: Load the data
+file_path = 'Salary_positions.csv'  # Update this path as necessary
+data = pd.read_csv(file_path)
 
-    public void turnOff() {
-        state = "off";
-        System.out.println("Ceiling Fan is OFF");
-    }
+# Step 2: Preprocess the data
+# Check the first few rows of the dataset
+print(data.head())
 
-    public String getState() {
-        return state;
-    }
-}
+# Check for missing values
+print(data.isnull().sum())
 
-class TurnOnFanCommand implements Command {
-    private CeilingFan fan;
+# Drop rows with missing values if any
+data.dropna(inplace=True)
 
-    public TurnOnFanCommand(CeilingFan fan) {
-        this.fan = fan;
-    }
+# Step 3: Fit the simple linear regression model
+# Assume the dataset has 'Level' and 'Salary' columns
+X = data[['Level']]  # Feature
+y = data['Salary']   # Target variable
 
-    public void execute() {
-        fan.turnOn();
-    }
+# Split the data into training and testing sets (optional)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    public void undo() {
-        fan.turnOff();
-    }
-}
+# Create a linear regression model
+model = LinearRegression()
 
-class TurnOffFanCommand implements Command {
-    private CeilingFan fan;
+# Fit the model
+model.fit(X_train, y_train)
 
-    public TurnOffFanCommand(CeilingFan fan) {
-        this.fan = fan;
-    }
+# Step 4: Make predictions for level 11 and level 12
+levels_to_predict = pd.DataFrame({'Level': [11, 12]})
+predictions = model.predict(levels_to_predict)
 
-    public void execute() {
-        fan.turnOff();
-    }
+# Display the predictions
+for level, salary in zip(levels_to_predict['Level'], predictions):
+    print(f'Predicted salary for Level {level}: ${salary:.2f}')
 
-    public void undo() {
-        fan.turnOn();
-    }
-}
 
-class RemoteControl {
-    private Command lastCommand;
-
-    public void pressButton(Command command) {
-        command.execute();
-        lastCommand = command;
-    }
-
-    public void pressUndo() {
-        if (lastCommand != null) {
-            lastCommand.undo();
-        }
-    }
-}
-
-public class UndoCommandPatternExample {
-    public static void main(String[] args) {
-        CeilingFan fan = new CeilingFan();
-        Command turnOnFan = new TurnOnFanCommand(fan);
-        Command turnOffFan = new TurnOffFanCommand(fan);
-
-        RemoteControl remote = new RemoteControl();
-
-        remote.pressButton(turnOnFan);
-        remote.pressUndo();
-
-        remote.pressButton(turnOffFan);
-        remote.pressUndo();
-    }
-}
+Level,Salary
+1,30000
+2,35000
+3,40000
+4,45000
+5,50000
+6,55000
+7,60000
+8,65000
+9,70000
+10,75000
+11,80000
+12,85000
+13,90000
+14,95000
