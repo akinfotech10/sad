@@ -1,202 +1,45 @@
-interface State {
-    void insertCoin();
-    void ejectCoin();
-    void turnCrank();
-    void dispense();
-}
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.datasets import fetch_20newsgroups
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 
-class GumballMachine {
-    State noCoinState;
-    State hasCoinState;
-    State soldOutState;
-    State soldState;
+newsgroups = fetch_20newsgroups(subset='all')
 
-    State currentState;
-    int count = 0;
+X = newsgroups.data  # The news articles (text data)
+y = newsgroups.target  # The corresponding categories (0 to 19)
 
-    public GumballMachine(int numberOfGumballs) {
-        noCoinState = new NoCoinState(this);
-        hasCoinState = new HasCoinState(this);
-        soldOutState = new SoldOutState(this);
-        soldState = new SoldState(this);
+tfidf_vectorizer = TfidfVectorizer(stop_words='english', max_df=0.95, min_df=2)
+X_tfidf = tfidf_vectorizer.fit_transform(X)
 
-        this.count = numberOfGumballs;
-        if (numberOfGumballs > 0) {
-            currentState = noCoinState;
-        } else {
-            currentState = soldOutState;
-        }
-    }
+X_train, X_test, y_train, y_test = train_test_split(X_tfidf, y, test_size=0.2, random_state=42)
 
-    void setState(State state) {
-        currentState = state;
-    }
+naive_bayes = MultinomialNB()
+naive_bayes.fit(X_train, y_train)
 
-    void releaseBall() {
-        if (count != 0) {
-            count--;
-        }
-    }
+y_pred = naive_bayes.predict(X_test)
 
-    void insertCoin() {
-        currentState.insertCoin();
-    }
+accuracy = accuracy_score(y_test, y_pred)
+print(f"\nAccuracy: {accuracy * 100:.2f}%")
 
-    void ejectCoin() {
-        currentState.ejectCoin();
-    }
+print("\nConfusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
 
-    void turnCrank() {
-        currentState.turnCrank();
-        currentState.dispense();
-    }
+    print("\nClassification Report:")
+print(classification_report(y_test, y_pred, target_names=newsgroups.target_names))
 
-    void refill(int count) {
-        this.count = count;
-        setState(noCoinState);
-    }
+import seaborn as sns
+plt.figure(figsize=(10, 7))
+sns.heatmap(confusion_matrix(y_test, y_pred), annot=True, fmt="d", cmap="Blues", xticklabels=newsgroups.target_names, yticklabels=newsgroups.target_names)
+plt.title("Confusion Matrix - Multinomial Naive Bayes")
+plt.xlabel('Predicted')
+plt.ylabel('True')
+plt.show()
 
-    public int getCount() {
-        return count;
-    }
-
-    public State getCurrentState() {
-        return currentState;
-    }
-
-    public State getNoCoinState() {
-        return noCoinState;
-    }
-
-    public State getHasCoinState() {
-        return hasCoinState;
-    }
-
-    public State getSoldOutState() {
-        return soldOutState;
-    }
-
-    public State getSoldState() {
-        return soldState;
-    }
-}
-
-class NoCoinState implements State {
-    GumballMachine gumballMachine;
-
-    public NoCoinState(GumballMachine gumballMachine) {
-        this.gumballMachine = gumballMachine;
-    }
-
-    public void insertCoin() {
-        System.out.println("You inserted a coin");
-        gumballMachine.setState(gumballMachine.getHasCoinState());
-    }
-
-    public void ejectCoin() {
-        System.out.println("You haven't inserted a coin");
-    }
-
-    public void turnCrank() {
-        System.out.println("You turned the crank, but there's no coin");
-    }
-
-    public void dispense() {
-        System.out.println("You need to pay first");
-    }
-}
-
-class HasCoinState implements State {
-    GumballMachine gumballMachine;
-
-    public HasCoinState(GumballMachine gumballMachine) {
-        this.gumballMachine = gumballMachine;
-    }
-
-    public void insertCoin() {
-        System.out.println("You can't insert another coin");
-    }
-
-    public void ejectCoin() {
-        System.out.println("Coin returned");
-        gumballMachine.setState(gumballMachine.getNoCoinState());
-    }
-
-    public void turnCrank() {
-        System.out.println("You turned the crank");
-        gumballMachine.setState(gumballMachine.getSoldState());
-    }
-
-    public void dispense() {
-        System.out.println("No gumball dispensed");
-    }
-}
-
-class SoldState implements State {
-    GumballMachine gumballMachine;
-
-    public SoldState(GumballMachine gumballMachine) {
-        this.gumballMachine = gumballMachine;
-    }
-
-    public void insertCoin() {
-        System.out.println("Please wait, we're already giving you a gumball");
-    }
-
-    public void ejectCoin() {
-        System.out.println("Sorry, you already turned the crank");
-    }
-
-    public void turnCrank() {
-        System.out.println("Turning again doesn't get you another gumball");
-    }
-
-    public void dispense() {
-        gumballMachine.releaseBall();
-        if (gumballMachine.getCount() > 0) {
-            gumballMachine.setState(gumballMachine.getNoCoinState());
-        } else {
-            System.out.println("Out of gumballs");
-            gumballMachine.setState(gumballMachine.getSoldOutState());
-        }
-    }
-}
-
-class SoldOutState implements State {
-    GumballMachine gumballMachine;
-
-    public SoldOutState(GumballMachine gumballMachine) {
-        this.gumballMachine = gumballMachine;
-    }
-
-    public void insertCoin() {
-        System.out.println("Sorry, we're sold out");
-    }
-
-    public void ejectCoin() {
-        System.out.println("You can't eject, you haven't inserted a coin");
-    }
-
-    public void turnCrank() {
-        System.out.println("You turned the crank, but there's no gumballs");
-    }
-
-    public void dispense() {
-        System.out.println("No gumball dispensed");
-    }
-}
-
-public class GumballMachineTest {
-    public static void main(String[] args) {
-        GumballMachine gumballMachine = new GumballMachine(2);
-
-        gumballMachine.insertCoin();
-        gumballMachine.turnCrank();
-
-        gumballMachine.insertCoin();
-        gumballMachine.turnCrank();
-
-        gumballMachine.insertCoin();
-        gumballMachine.turnCrank();
-    }
-}
+new_article = ["The economy is showing strong signs of growth, with unemployment at a record low."]
+new_article_tfidf = tfidf_vectorizer.transform(new_article)
+predicted_category = naive_bayes.predict(new_article_tfidf)
+print(f"\nPredicted category for the new article: {newsgroups.target_names[predicted_category[0]]}")
