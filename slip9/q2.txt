@@ -1,39 +1,63 @@
-# Read the input string
-input_string = input("Enter a string: ")
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+import matplotlib.pyplot as plt
 
-# Count words and characters
-word_count = len(input_string.split())
-char_count = len(input_string.replace(" ", ""))
-
-# Print the results
-print(f"Word Count: {word_count}")
-print(f"Character Count (excluding spaces): {char_count}")
+data = pd.read_csv('UniversalBank.csv')
 
 
-import math
+print(data.head())
 
-# Read the shape type
-shape = input("Enter the shape (rectangle/triangle/circle): ").lower()
+data = data.drop(columns=['ID', 'ZIP Code'])
 
-if shape == "rectangle":
-    # Read rectangle dimensions
-    length = float(input("Enter the length of the rectangle: "))
-    width = float(input("Enter the width of the rectangle: "))
-    area = length * width
-    print(f"The area of the rectangle is: {area}")
-    
-elif shape == "triangle":
-    # Read triangle dimensions
-    base = float(input("Enter the base of the triangle: "))
-    height = float(input("Enter the height of the triangle: "))
-    area = 0.5 * base * height
-    print(f"The area of the triangle is: {area}")
-    
-elif shape == "circle":
-    # Read radius of the circle
-    radius = float(input("Enter the radius of the circle: "))
-    area = math.pi * radius ** 2
-    print(f"The area of the circle is: {area}")
-    
-else:
-    print("Invalid shape. Please choose either rectangle, triangle, or circle.")
+data = pd.get_dummies(data, drop_first=True)  
+
+X = data.drop(columns=['Personal Loan'])
+y = data['Personal Loan']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+svm_model = SVC(kernel='linear', random_state=42)
+svm_model.fit(X_train_scaled, y_train)
+
+y_pred = svm_model.predict(X_test_scaled)
+
+accuracy = accuracy_score(y_test, y_pred)
+print(f'Accuracy: {accuracy * 100:.2f}%')
+
+print("Confusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
+
+rint("Classification Report:")
+print(classification_report(y_test, y_pred))
+
+import seaborn as sns
+cm = confusion_matrix(y_test, y_pred)
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=['Not Loan', 'Loan'], yticklabels=['Not Loan', 'Loan'])
+plt.xlabel('Predicted')
+plt.ylabel('Actual')
+plt.title('Confusion Matrix for Linear SVM')
+plt.show()
+
+
+ID,Age,Experience,Income,ZIP Code,Family,CCAvg,Education,Mortgage,Personal Loan
+1,25,1,49,91107,1,1.6,1,0,0
+2,45,19,34,91107,1,1.5,1,0,0
+3,39,15,60,91107,1,2.0,1,0,0
+4,35,12,80,91107,1,1.5,1,0,0
+5,35,12,60,91107,1,1.5,1,0,0
+6,35,12,70,91107,1,1.5,1,0,0
+7,35,12,90,91107,1,1.5,1,0,0
+8,35,12,100,91107,1,1.5,1,0,0
+9,35,12,110,91107,1,1.5,1,0,0
+10,35,12,120,91107,1,1.5,1,0,0
+11,35,12,130,91107,1,1.5,1,0,0
+12,35,12,140,91107,1,1.5,1,0,0
+13,35,12,150,91107,1,1.5,1,0,0
