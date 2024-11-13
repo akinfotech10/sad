@@ -1,16 +1,36 @@
-import java.io.Reader;
-import java.io.FilterReader;
-import java.io.IOException;
+import pandas as pd
+import numpy as np
+from mlxtend.frequent_patterns import apriori, association_rules
 
-public class SimpleLowerCaseReader extends FilterReader {
+df = pd.read_csv('groceries.csv')
 
-    public SimpleLowerCaseReader(Reader in) {
-        super(in);
-    }
+print("Dataset Overview:")
+print(df.head())
 
-    @Override
-    public int read() throws IOException {
-        int c = super.read();
-        return (c == -1) ? c : Character.toLowerCase(c);
-    }
-}
+frequent_itemsets = apriori(df, min_support=0.25, use_colnames=True)
+
+if 'num_itemsets' in association_rules.__code__.co_varnames:
+    rules = association_rules(frequent_itemsets, metric="lift", min_threshold=1, num_itemsets=len(frequent_itemsets))
+else:
+    rules = association_rules(frequent_itemsets, metric="lift", min_threshold=1)
+    
+print("\nFrequent Itemsets (Support >= 0.25):")
+print(frequent_itemsets)
+
+print("\nAssociation Rules:")
+print(rules)
+
+filtered_rules = rules[rules['lift'] > 2]
+print("\nFiltered Rules (Lift > 2):")
+print(filtered_rules)
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+plt.figure(figsize=(10, 6))
+sns.barplot(x='lift', y='antecedents', data=filtered_rules.head(10))
+plt.title('Top 10 Association Rules by Lift')
+plt.xlabel('Lift')
+plt.ylabel('Antecedents (Items)')
+plt.show()
+
