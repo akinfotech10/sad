@@ -34,3 +34,12 @@ plt.xlabel('Lift')
 plt.ylabel('Antecedents (Items)')
 plt.show()
 
+
+groceries.csv
+Milk	Bread	Eggs	Cheese
+1	1	0	0
+1	0	1	1
+0	1	1	0
+1	1	0	1
+0	0	1	1
+
