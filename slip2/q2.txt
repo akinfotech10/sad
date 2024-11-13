@@ -1,34 +1,40 @@
-#define TRIG_PIN 9
-#define ECHO_PIN 10
-#define LED_PIN 13
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import AgglomerativeClustering
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-void setup() {
-  pinMode(TRIG_PIN, OUTPUT);
-  pinMode(ECHO_PIN, INPUT);
-  pinMode(LED_PIN, OUTPUT);
-  Serial.begin(9600);
-}
+data = pd.read_csv('wholesale_customers_with_clusters.csv')
 
-void loop() {
-  digitalWrite(TRIG_PIN, LOW);
-  delayMicroseconds(2);
-  digitalWrite(TRIG_PIN, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(TRIG_PIN, LOW);
+print(data.info())
 
-  long duration = pulseIn(ECHO_PIN, HIGH);
-  int distance = duration * 0.034 / 2;
+print(data.isnull().sum())
 
-  Serial.println(distance);
+data = data.dropna()
 
-  if (distance < 20) {
-    digitalWrite(LED_PIN, HIGH);  // LED on if object is closer than 20 cm
-    delay(500);                   // LED blink delay
-    digitalWrite(LED_PIN, LOW);   // LED off
-    delay(500);
-  } else {
-    digitalWrite(LED_PIN, LOW);   // LED remains off
-  }
+features = data.drop(['Region', 'Channel'], axis=1)
 
-  delay(100); // Small delay before the next reading
-}
+scaler = StandardScaler()
+scaled_data = scaler.fit_transform(features)
+
+agg_clust = AgglomerativeClustering(n_clusters=3)
+data['Cluster'] = agg_clust.fit_predict(scaled_data)
+
+print(data[['Region', 'Channel', 'Cluster']].head())
+
+plt.figure(figsize=(10, 6))
+sns.scatterplot(data=data, x='Fresh', y='Milk', hue='Cluster', palette='viridis')
+plt.title('Agglomerative Clustering of Clients')
+plt.xlabel('Fresh Spending')
+plt.ylabel('Milk Spending')
+plt.show()
+
+Region	Channel	Fresh	Milk	Grocery	Frozen	Detergents_Paper	Delicatessen	Cluster
+Lisbon	Hotel	1000	500	300	100	250	50	2
+Oporto	Retail	2000	600	400	200	350	100	1
+Oporto	Retail	1500	700	500	300	450	150	1
+Lisbon	Hotel	3000	800	600	400	500	200	0
+Lisbon	Retail	3500	1000	800	450	650	250	0
+Oporto	Hotel	2500	650	750	500	600	300	0
+
+
