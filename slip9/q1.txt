@@ -1,182 +1,64 @@
-package com.example.hrapp;
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import Ridge, Lasso
+from sklearn.metrics import mean_squared_error
+import matplotlib.pyplot as plt
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+data = pd.read_csv('boston_houses.csv')
 
-@SpringBootApplication
-public class HrAppApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(HrAppApplication.class, args);
-    }
-}
+data = data[['RM', 'Price']]
 
+X = data[['RM']]  
+y = data['Price']  
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-package com.example.hrapp.model;
+ridge_model = Ridge(alpha=1.0)  
+ridge_model.fit(X_train, y_train)
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+lasso_model = Lasso(alpha=0.1)  
+lasso_model.fit(X_train, y_train)
 
-@Entity
-public class Employee {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String name;
-    private String position;
-    private double salary;
+rooms = np.array([[5]])  
 
-    public Employee() {}
+ridge_pred = ridge_model.predict(rooms)
+lasso_pred = lasso_model.predict(rooms)
 
-    public Employee(String name, String position, double salary) {
-        this.name = name;
-        this.position = position;
-        this.salary = salary;
-    }
+print(f"Ridge Regression Prediction (Price for 5 rooms): ${ridge_pred[0]:,.2f}")
+print(f"Lasso Regression Prediction (Price for 5 rooms): ${lasso_pred[0]:,.2f}")
 
-    // Getters and setters
-    public Long getId() {
-        return id;
-    }
+ridge_y_pred = ridge_model.predict(X_test)
+lasso_y_pred = lasso_model.predict(X_test)
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+ridge_mse = mean_squared_error(y_test, ridge_y_pred)
+lasso_mse = mean_squared_error(y_test, lasso_y_pred)
 
-    public String getName() {
-        return name;
-    }
+print(f"Ridge Regression MSE: {ridge_mse:.2f}")
+print(f"Lasso Regression MSE: {lasso_mse:.2f}")
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getPosition() {
-        return position;
-    }
-
-    public void setPosition(String position) {
-        this.position = position;
-    }
-
-    public double getSalary() {
-        return salary;
-    }
-
-    public void setSalary(double salary) {
-        this.salary = salary;
-    }
-}
+plt.scatter(X_test, y_test, color='blue', label='True prices')
+plt.plot(X_test, ridge_y_pred, color='red', label='Ridge Regression')
+plt.plot(X_test, lasso_y_pred, color='green', label='Lasso Regression')
+plt.xlabel('Number of Rooms (RM)')
+plt.ylabel('Price')
+plt.legend()
+plt.title('Ridge vs Lasso Regression')
+plt.show()
 
 
-package com.example.hrapp.repository;
-
-import com.example.hrapp.model.Employee;
-import org.springframework.data.jpa.repository.JpaRepository;
-
-public interface EmployeeRepository extends JpaRepository<Employee, Long> {
-}
-
-
-package com.example.hrapp.service;
-
-import com.example.hrapp.model.Employee;
-import com.example.hrapp.repository.EmployeeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-
-@Service
-public class EmployeeService {
-
-    @Autowired
-    private EmployeeRepository employeeRepository;
-
-    public List<Employee> getAllEmployees() {
-        return employeeRepository.findAll();
-    }
-
-    public Employee addEmployee(Employee employee) {
-        return employeeRepository.save(employee);
-    }
-}
-
-
-package com.example.hrapp.controller;
-
-import com.example.hrapp.model.Employee;
-import com.example.hrapp.service.EmployeeService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-
-@Controller
-public class EmployeeController {
-
-    @Autowired
-    private EmployeeService employeeService;
-
-    @GetMapping("/")
-    public String home(Model model) {
-        model.addAttribute("employees", employeeService.getAllEmployees());
-        model.addAttribute("employee", new Employee());
-        return "index";
-    }
-
-    @PostMapping("/addEmployee")
-    public String addEmployee(@ModelAttribute Employee employee) {
-        employeeService.addEmployee(employee);
-        return "redirect:/";
-    }
-}
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HR Application</title>
-</head>
-<body>
-
-<h1>HR Application</h1>
-
-<!-- Employee Form -->
-<h2>Add New Employee</h2>
-<form action="/addEmployee" method="post">
-    <label for="name">Name:</label>
-    <input type="text" id="name" name="name" required><br><br>
-    
-    <label for="position">Position:</label>
-    <input type="text" id="position" name="position" required><br><br>
-    
-    <label for="salary">Salary:</label>
-    <input type="number" id="salary" name="salary" required><br><br>
-    
-    <button type="submit">Add Employee</button>
-</form>
-
-<hr>
-
-<!-- Employee List -->
-<h2>Employee List</h2>
-<table border="1">
-    <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Position</th>
-        <th>Salary</th>
-    </tr>
-    <tr th:each="employee : ${employees}">
-        <td th:text="${employee.id}"></td>
-        <td th:text="${employee.name}"></td>
-        <td th:text="${employee.position}"></td>
-        <td th:text="${employee.salary}"></td>
-    </tr>
-</table>
-
-</body>
-</html>
+RM,Price
+6.575,  24.0
+6.421,  21.6
+7.185,  34.7
+6.998,  33.4
+7.147,  36.2
+6.43,   28.7
+6.012,  18.5
+6.172,  19.9
+5.631,  17.3
+6.004,  20.6
+6.377,  22.0
+6.409,  22.5
+5.998,  18.9
+6.593,  27.5
+6.593,  24.0
