@@ -1,74 +1,47 @@
-import java.util.Observable;
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler
 
-class WeatherStation extends Observable {
-    private float temperature;
-    private float humidity;
-    private float pressure;
+data = pd.read_csv('house_prices.csv')
 
-    public void setMeasurement(float temperature, float humidity, float pressure) {
-        this.temperature = temperature;
-        this.humidity = humidity;
-        this.pressure = pressure;
-        measurementsChanged();
-    }
+data = data.dropna()
 
-    private void measurementsChanged() {
-        setChanged();
-        notifyObservers();
-    }
+X = data[['Size', 'Bedrooms', 'Age']]
+y = data['Price']
 
-    public float getTemperature() {
-        return temperature;
-    }
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    public float getHumidity() {
-        return humidity;
-    }
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
 
-    public float getPressure() {
-        return pressure;
-    }
-}
+model = LinearRegression()
+model.fit(X_train, y_train)
 
+y_pred = model.predict(X_test)
 
+mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)
+r2 = r2_score(y_test, y_pred)
 
+print(f'Mean Squared Error (MSE): {mse}')
+print(f'Root Mean Squared Error (RMSE): {rmse}')
+print(f'R-squared (R2): {r2}')
 
-import java.util.Observable;
-import java.util.Observer;
+print("Coefficients: ", model.coef_)
+print("Intercept: ", model.intercept_)
 
-class WeatherDisplay implements Observer {
-    private float temperature;
-    private float humidity;
-    private float pressure;
-
-    @Override
-    public void update(Observable obs, Object arg) {
-        if (obs instanceof WeatherStation) {
-            WeatherStation weatherStation = (WeatherStation) obs;
-            this.temperature = weatherStation.getTemperature();
-            this.humidity = weatherStation.getHumidity();
-            this.pressure = weatherStation.getPressure();
-            display();
-        }
-    }
-
-    private void display() {
-        System.out.println("Temperature: " + temperature + "°C");
-        System.out.println("Humidity: " + humidity + "%");
-        System.out.println("Pressure: " + pressure + " hPa");
-    }
-}
-
-
-public class Main {
-    public static void main(String[] args) {
-        WeatherStation weatherStation = new WeatherStation();
-        WeatherDisplay weatherDisplay = new WeatherDisplay();
-
-        weatherStation.addObserver(weatherDisplay);
-        
-        // Simulate new measurements
-        weatherStation.setMeasurement(25.3f, 65f, 1013.1f);
-        weatherStation.setMeasurement(27.8f, 70f, 1012.5f);
-    }
-}
+Size,Bedrooms,Age,Price
+1500,3,10,400000
+1800,4,5,450000
+2400,4,15,500000
+3000,5,20,600000
+3500,5,10,650000
+4000,6,8,750000
+2200,3,7,480000
+2500,4,12,530000
+2800,4,3,570000
+1900,3,18,420000
