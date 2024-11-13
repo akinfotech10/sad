@@ -1,90 +1,31 @@
-interface FlyBehavior {
-    void fly();
-}
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+from sklearn.datasets import load_iris
 
-interface QuackBehavior {
-    void quack();
-}
+iris = load_iris()
+X = iris.data  
+y = iris.target  
 
-class FlyWithWings implements FlyBehavior {
-    public void fly() {
-        System.out.println("Flying with wings!");
-    }
-}
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
 
-class FlyNoWay implements FlyBehavior {
-    public void fly() {
-        System.out.println("Can't fly.");
-    }
-}
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X_scaled)
 
-class Quack implements QuackBehavior {
-    public void quack() {
-        System.out.println("Quack!");
-    }
-}
+plt.figure(figsize=(8,6))
+plt.scatter(X_pca[:, 0], X_pca[:, 1], c=y, cmap='viridis', edgecolor='k', s=50)
+plt.title('PCA of Iris Dataset')
+plt.xlabel('First Principal Component')
+plt.ylabel('Second Principal Component')
+plt.colorbar(label='Species')
+plt.show()
 
-class MuteQuack implements QuackBehavior {
-    public void quack() {
-        System.out.println("<< Silence >>");
-    }
-}
 
-abstract class Duck {
-    FlyBehavior flyBehavior;
-    QuackBehavior quackBehavior;
+print("Explained Variance Ratio:")
+print(pca.explained_variance_ratio_)
 
-    public void performFly() {
-        flyBehavior.fly();
-    }
+print(f"Total explained variance by 2 components: {sum(pca.explained_variance_ratio_):.2f}")
 
-    public void performQuack() {
-        quackBehavior.quack();
-    }
-
-    public void setFlyBehavior(FlyBehavior fb) {
-        flyBehavior = fb;
-    }
-
-    public void setQuackBehavior(QuackBehavior qb) {
-        quackBehavior = qb;
-    }
-
-    public abstract void display();
-}
-
-class MallardDuck extends Duck {
-    public MallardDuck() {
-        flyBehavior = new FlyWithWings();
-        quackBehavior = new Quack();
-    }
-
-    public void display() {
-        System.out.println("I'm a Mallard Duck!");
-    }
-}
-
-class RubberDuck extends Duck {
-    public RubberDuck() {
-        flyBehavior = new FlyNoWay();
-        quackBehavior = new MuteQuack();
-    }
-
-    public void display() {
-        System.out.println("I'm a Rubber Duck!");
-    }
-}
-
-public class DuckTest {
-    public static void main(String[] args) {
-        Duck mallard = new MallardDuck();
-        mallard.display();
-        mallard.performFly();
-        mallard.performQuack();
-
-        Duck rubberDuck = new RubberDuck();
-        rubberDuck.display();
-        rubberDuck.performFly();
-        rubberDuck.performQuack();
-    }
-}
