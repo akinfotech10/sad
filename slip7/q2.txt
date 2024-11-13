@@ -1,14 +1,66 @@
-int ldrPin = A0;
-int ledPin = 9;
-int ldrValue = 0;
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 
-void setup() {
-  pinMode(ledPin, OUTPUT);
-}
+df = pd.read_csv('weather.csv')
 
-void loop() {
-  ldrValue = analogRead(ldrPin);
-  int ledBrightness = map(ldrValue, 0, 1023, 0, 255);
-  analogWrite(ledPin, ledBrightness);
-  delay(100);
-}
+print("\nDataset Overview:")
+print(df.head())
+
+label_encoder = LabelEncoder()
+
+df['Outlook'] = label_encoder.fit_transform(df['Outlook'])
+df['Temperature'] = label_encoder.fit_transform(df['Temperature'])
+df['Humidity'] = label_encoder.fit_transform(df['Humidity'])
+df['Wind'] = label_encoder.fit_transform(df['Wind'])
+df['PlayTennis'] = label_encoder.fit_transform(df['PlayTennis'])
+
+X = df[['Outlook', 'Temperature', 'Humidity', 'Wind']]  
+y = df['PlayTennis']  
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+naive_bayes_model = GaussianNB()
+naive_bayes_model.fit(X_train, y_train)
+
+y_pred = naive_bayes_model.predict(X_test)
+
+accuracy = accuracy_score(y_test, y_pred)
+print(f"\nAccuracy: {accuracy * 100:.2f}%")
+
+print("\nConfusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
+
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred))
+
+new_data = pd.DataFrame({
+    'Outlook': [label_encoder.transform(['Sunny'])[0]],
+    'Temperature': [label_encoder.transform(['Hot'])[0]],
+    'Humidity': [label_encoder.transform(['High'])[0]],
+    'Wind': [label_encoder.transform(['Weak'])[0]]
+})
+
+new_prediction = naive_bayes_model.predict(new_data)
+new_prediction = label_encoder.inverse_transform(new_prediction)
+print(f"\nPrediction for new data: Will play tennis? {new_prediction[0]}")
+
+
+
+Outlook,Temperature,Humidity,Wind,PlayTennis
+Sunny,Hot,High,Weak,No
+Sunny,Hot,High,Strong,No
+Overcast,Hot,High,Weak,Yes
+Rain,Mild,High,Weak,Yes
+Rain,Cool,Normal,Weak,Yes
+Rain,Cool,Normal,Strong,No
+Overcast,Cool,Normal,Strong,Yes
+Sunny,Mild,High,Weak,No
+Sunny,Cool,Normal,Weak,Yes
+Rain,Mild,Normal,Weak,Yes
+Sunny,Mild,Normal,Strong,Yes
+Overcast,Mild,High,Strong,Yes
+Overcast,Hot,Normal,Weak,Yes
+Rain,Mild,High,Strong,No
