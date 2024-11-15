@@ -1,1 +1,73 @@
+mkdir express-validation-app
+cd express-validation-app
 
+npm init -y
+
+npm install express body-parser express-validator
+
+touch app.js
+
+// app.js
+const express = require('express');
+const bodyParser = require('body-parser');
+const { body, validationResult } = require('express-validator');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// In-memory storage for employees (for demonstration purposes)
+let employees = [];
+
+app.post('/employees', [
+    body('id').notEmpty().withMessage('ID is required'),
+    body('name').notEmpty().withMessage('Name is required'),
+    body('position').notEmpty().withMessage('Position is required'),
+    body('salary').isNumeric().withMessage('Salary must be a number')
+], (req, res) => {
+    // Validate input
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { id, name, position, salary } = req.body;
+
+    const existingEmployee = employees.find(emp => emp.id === id);
+    if (existingEmployee) {
+        return res.status(400).json({ error: 'Employee with this ID already exists' });
+    }
+
+    const newEmployee = { id, name, position, salary };
+    employees.push(newEmployee);
+    res.status(201).json({ message: 'Employee created successfully', employee: newEmployee });
+});
+
+app.put('/employees/:id', [
+    body('name').optional().notEmpty().withMessage('Name cannot be empty'),
+    body('position').optional().notEmpty().withMessage('Position cannot be empty'),
+    body('salary').optional().isNumeric().withMessage('Salary must be a number')
+], (req, res) => {
+    const { id } = req.params;
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    const employeeIndex = employees.findIndex(emp => emp.id === id);
+    if (employeeIndex === -1) {
+        return res.status(404).json({ error: 'Employee not found' });
+    }
+
+    const updatedEmployee = { ...employees[employeeIndex], ...req.body };
+    employees[employeeIndex] = updatedEmployee;
+
+    res.json({ message: 'Employee updated successfully', employee: updatedEmployee });
+});
+
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+});
