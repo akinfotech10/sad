@@ -1,58 +1,34 @@
-pip install pandas scikit-learn
+const fs = require('fs').promises;
+const path = require('path');
 
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
+const readFile = async (filePath) => {
+  try {
+    const data = await fs.readFile(filePath, 'utf-8');
+    return data;
+  } catch (error) {
+    console.error(`Error reading file ${filePath}:`, error);
+    throw error;  
+  }
+};
 
-# Step 1: Load the data
-file_path = 'Salary_positions.csv'  # Update this path as necessary
-data = pd.read_csv(file_path)
+const readMultipleFiles = async (filePaths) => {
+  try {
+    const filePromises = filePaths.map(filePath => readFile(filePath));
+    const fileContents = await Promise.all(filePromises);
+    
+    fileContents.forEach((content, index) => {
+      console.log(`Content of ${filePaths[index]}:`);
+      console.log(content);
+    });
+  } catch (error) {
+    console.error('Error reading multiple files:', error);
+  }
+};
 
-# Step 2: Preprocess the data
-# Check the first few rows of the dataset
-print(data.head())
+const filePaths = [
+  path.join(__dirname, 'file1.txt'),
+  path.join(__dirname, 'file2.txt'),
+  path.join(__dirname, 'file3.txt')
+];
 
-# Check for missing values
-print(data.isnull().sum())
-
-# Drop rows with missing values if any
-data.dropna(inplace=True)
-
-# Step 3: Fit the simple linear regression model
-# Assume the dataset has 'Level' and 'Salary' columns
-X = data[['Level']]  # Feature
-y = data['Salary']   # Target variable
-
-# Split the data into training and testing sets (optional)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# Create a linear regression model
-model = LinearRegression()
-
-# Fit the model
-model.fit(X_train, y_train)
-
-# Step 4: Make predictions for level 11 and level 12
-levels_to_predict = pd.DataFrame({'Level': [11, 12]})
-predictions = model.predict(levels_to_predict)
-
-# Display the predictions
-for level, salary in zip(levels_to_predict['Level'], predictions):
-    print(f'Predicted salary for Level {level}: ${salary:.2f}')
-
-
-Level,Salary
-1,30000
-2,35000
-3,40000
-4,45000
-5,50000
-6,55000
-7,60000
-8,65000
-9,70000
-10,75000
-11,80000
-12,85000
-13,90000
-14,95000
+readMultipleFiles(filePaths);
