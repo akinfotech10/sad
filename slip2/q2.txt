@@ -1,1 +1,96 @@
 
+npm install -g @angular/cli
+
+ng new api-fetch-app
+cd api-fetch-app
+
+ng generate service data
+
+ng generate service data
+
+// src/app/data.service.ts
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class DataService {
+  private apiUrl = 'https://jsonplaceholder.typicode.com/users';
+
+  constructor(private http: HttpClient) {}
+
+  // Method to fetch data from the API
+  fetchData(): Observable<any[]> {
+    return this.http.get<any[]>(this.apiUrl);
+  }
+}
+
+ng generate component user-list
+
+// src/app/user-list/user-list.component.ts
+import { Component, OnInit } from '@angular/core';
+import { DataService } from '../data.service';
+
+@Component({
+  selector: 'app-user-list',
+  templateUrl: './user-list.component.html',
+  styleUrls: ['./user-list.component.css']
+})
+export class UserListComponent implements OnInit {
+  users: any[] = [];
+  errorMessage: string = '';
+
+  constructor(private dataService: DataService) {}
+
+  ngOnInit(): void {
+    this.dataService.fetchData().subscribe({
+      next: (data) => {
+        this.users = data;
+      },
+      error: (error) => {
+        this.errorMessage = 'Error fetching data';
+        console.error(error);
+      }
+    });
+  }
+}
+
+<!-- src/app/user-list/user-list.component.html -->
+<div>
+  <h2>User List</h2>
+  <div *ngIf="errorMessage">{{ errorMessage }}</div>
+  <ul>
+    <li *ngFor="let user of users">
+      {{ user.name }} ({{ user.email }})
+    </li>
+  </ul>
+</div>
+
+// src/app/app.module.ts
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { HttpClientModule } from '@angular/common/http';
+
+import { AppComponent } from './app.component';
+import { UserListComponent } from './user-list/user-list.component';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    UserListComponent
+  ],
+  imports: [
+    BrowserModule,
+    HttpClientModule 
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+
+<!-- src/app/app.component.html -->
+<app-user-list></app-user-list>
+
+ng serve
