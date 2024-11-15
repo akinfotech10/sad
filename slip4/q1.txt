@@ -1,105 +1,47 @@
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.cluster import KMeans
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import silhouette_score
+<html lang="en" ng-app="companyApp">
+<head>
+   
+    <title>Company List</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+</head>
+<body>
 
-# Step 1: Load the dataset
-data = pd.read_csv('mall_customers.csv')
+    <div ng-controller="CompanyController">
 
-# Inspect the first few rows of the dataset
-print(data.head())
+        <h2>List of Companies</h2>
 
-# Step 2: Preprocess the data
-# Selecting relevant features for clustering (e.g., 'Annual Income' and 'Spending Score')
-X = data[['Annual Income (k$)', 'Spending Score (1-100)']]
+        <!-- Table to display company details -->
+        <table border="1" cellpadding="10" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Company Name</th>
+                    <th>Workforce</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="company in companies">
+                    <td>{{ company.id }}</td>
+                    <td>{{ company.name }}</td>
+                    <td>{{ company.workforce }}</td>
+                </tr>
+            </tbody>
+        </table>
 
-# Step 3: Standardize the data
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
+    </div>
 
-# Step 4: Apply K-Means Clustering
-# Try different values of k and find the optimal one (using the elbow method)
-inertia = []
-silhouette_scores = []
+    <script>
+        var app = angular.module('companyApp', []);
 
-for k in range(1, 11):
-    kmeans = KMeans(n_clusters=k, random_state=42)
-    kmeans.fit(X_scaled)
-    inertia.append(kmeans.inertia_)
-    if k > 1:
-        silhouette_scores.append(silhouette_score(X_scaled, kmeans.labels_))
+        app.controller('CompanyController', function($scope) {
+            $scope.companies = [
+                { id: 1, name: 'Company A', workforce: 25 },
+                { id: 2, name: 'Company B', workforce: 45 },
+                { id: 3, name: 'Company C', workforce: 30 },
+                { id: 4, name: 'Company D', workforce: 50 }
+            ];
+        });
+    </script>
 
-# Step 5: Plot the elbow curve to find the optimal k
-plt.figure(figsize=(10,6))
-plt.plot(range(1, 11), inertia, marker='o')
-plt.title('Elbow Method for Optimal k')
-plt.xlabel('Number of clusters (k)')
-plt.ylabel('Inertia')
-plt.show()
-
-# Step 6: Plot silhouette scores to find the best k
-plt.figure(figsize=(10,6))
-plt.plot(range(2, 11), silhouette_scores, marker='o', color='r')
-plt.title('Silhouette Scores for Optimal k')
-plt.xlabel('Number of clusters (k)')
-plt.ylabel('Silhouette Score')
-plt.show()
-
-# Step 7: Choose the optimal k (based on elbow method or silhouette score)
-optimal_k = 5  # Assuming from the plots you found 5 to be optimal
-
-# Fit KMeans with optimal k
-kmeans = KMeans(n_clusters=optimal_k, random_state=42)
-kmeans.fit(X_scaled)
-
-# Step 8: Assign cluster labels to the dataset
-data['Cluster'] = kmeans.labels_
-
-# Step 9: Visualize the clusters
-plt.figure(figsize=(10,6))
-plt.scatter(X_scaled[:, 0], X_scaled[:, 1], c=data['Cluster'], cmap='viridis')
-plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1], s=300, c='red', label='Centroids')
-plt.title('K-Means Clustering')
-plt.xlabel('Annual Income (scaled)')
-plt.ylabel('Spending Score (scaled)')
-plt.legend()
-plt.show()
-
-# Step 10: Analyze the clustering results
-# Check the cluster centers and the number of customers in each cluster
-print("Cluster Centers:\n", kmeans.cluster_centers_)
-print("\nNumber of customers in each cluster:")
-print(data['Cluster'].value_counts())
-
-# Step 11: Evaluate the clustering performance using silhouette score
-sil_score = silhouette_score(X_scaled, data['Cluster'])
-print(f"Silhouette Score: {sil_score}")
-
-CustomerID,Gender,Age,Annual Income (k$),Spending Score (1-100)
-1,Male,19,15,39
-2,Female,21,15,81
-3,Female,20,16,6
-4,Female,23,16,77
-5,Male,31,17,40
-6,Female,22,17,76
-7,Female,35,18,6
-8,Male,23,18,94
-9,Female,64,19,3
-10,Female,30,19,72
-11,Male,67,19,14
-12,Female,35,20,99
-13,Female,58,20,15
-14,Female,24,21,77
-15,Female,37,21,35
-16,Female,22,21,91
-17,Male,35,22,87
-18,Female,20,22,3
-19,Female,22,23,73
-20,Female,35,23,17
-21,Female,20,24,10
-22,Male,26,24,95
-23,Male,29,24,13
-
-
+</body>
+</html>
