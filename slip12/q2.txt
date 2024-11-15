@@ -1,28 +1,48 @@
-#include <SPI.h>
-#include <WiFiNINA.h>
 
-char ssid[] = "your_network";  
-char pass[] = "your_password";  
+const express = require('express');
+const app = express();
 
-int status = WL_IDLE_STATUS;
+app.use(express.json());
 
-void setup() {
-  Serial.begin(9600);
-  while (status != WL_CONNECTED) {
-    Serial.print("Connecting to WiFi...");
-    status = WiFi.begin(ssid, pass);
-    delay(10000);
+let users = [];
+
+app.post('/users', (req, res) => {
+  const { name, email, age } = req.body;
+
+  if (!name || !email || !age) {
+    return res.status(400).json({ error: 'Name, email, and age are required' });
   }
-  Serial.println("Connected to WiFi");
-}
 
-void loop() {
-  int networks = WiFi.scanNetworks();
-  Serial.println("Scanning WiFi networks...");
-  for (int i = 0; i < networks; i++) {
-    Serial.print(i + 1);
-    Serial.print(": ");
-    Serial.println(WiFi.SSID(i));
+  const newUser = {
+    id: users.length + 1,  
+    name,
+    email,
+    age
+  };
+
+  users.push(newUser);
+
+  res.status(201).json(newUser);  
+});
+
+app.get('/users', (req, res) => {
+  res.status(200).json(users);  
+});
+
+app.get('/users/:id', (req, res) => {
+  const userId = parseInt(req.params.id, 10);
+
+  const user = users.find(u => u.id === userId);
+
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' });
   }
-  delay(5000);
-}
+
+  res.status(200).json(user);  
+});
+
+const port = 3000;
+
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
+});
