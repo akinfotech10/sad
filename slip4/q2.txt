@@ -1,1 +1,43 @@
+mkdir express-validation-app
+cd express-validation-app
 
+npm init -y
+
+npm install express body-parser express-validator
+
+touch app.js
+
+// app.js
+const express = require('express');
+const bodyParser = require('body-parser');
+const { body, validationResult } = require('express-validator');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.post('/employees', [
+    body('name').isString().withMessage('Name must be a string'),
+    body('position').isString().withMessage('Position must be a string'),
+    body('salary').isNumeric().withMessage('Salary must be a number').isFloat({ gt: 0 }).withMessage('Salary must be greater than 0')
+], (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { name, position, salary } = req.body;
+
+    res.status(201).json({ message: 'Employee created successfully', employee: { name, position, salary } });
+});
+
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ error: 'Something went wrong!' });
+});
+
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+});
