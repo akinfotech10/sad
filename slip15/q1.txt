@@ -1,1 +1,40 @@
 
+const express = require('express');
+const app = express();
+
+const employees = [
+  { id: 1, name: 'Alice', position: 'Developer', salary: 24000 },
+  { id: 2, name: 'Bob', position: 'Manager', salary: 50000 },
+  { id: 3, name: 'Charlie', position: 'Designer', salary: 30000 },
+  { id: 4, name: 'David', position: 'Developer', salary: 22000 },
+  { id: 5, name: 'Eva', position: 'HR', salary: 35000 }
+];
+
+app.use(express.json());
+
+app.get('/employee/find', (req, res) => {
+  const employee = employees.find(emp => emp.salary > 25000);
+
+  if (employee) {
+    res.status(200).json(employee);
+  } else {
+    res.status(404).json({ message: 'No employee found with salary greater than 25,000' });
+  }
+});
+
+app.get('/employee/findById/:id', (req, res) => {
+  const { id } = req.params;
+  
+  const employee = employees.find(emp => emp.id === parseInt(id) && emp.salary > 25000);
+
+  if (employee) {
+    res.status(200).json(employee);
+  } else {
+    res.status(404).json({ message: `No employee found with ID ${id} and salary greater than 25,000` });
+  }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
