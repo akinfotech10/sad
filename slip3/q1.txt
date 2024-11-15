@@ -1,47 +1,46 @@
-import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error, r2_score
-from sklearn.preprocessing import StandardScaler
+<html lang="en" ng-app="gameApp">
+<head>
 
-data = pd.read_csv('house_prices.csv')
+    <title>Game List </title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+</head>
+<body>
 
-data = data.dropna()
+    <div ng-controller="GameController" ng-init="games=[]; showGames=false;">
 
-X = data[['Size', 'Bedrooms', 'Age']]
-y = data['Price']
+        <h2>Game List</h2>
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        <button ng-click="loadGames()">Show Game List</button>
 
-scaler = StandardScaler()
-X_train = scaler.fit_transform(X_train)
-X_test = scaler.transform(X_test)
+        <div ng-show="showGames">
+            <h3>List of Games:</h3>
+            <ul>
+                <li ng-repeat="game in games" ng-bind="game"></li>
+            </ul>
+        </div>
 
-model = LinearRegression()
-model.fit(X_train, y_train)
+        <div ng-show="!showGames">
+            <p ng-bind="'Click the button to load the game list.'"></p>
+        </div>
 
-y_pred = model.predict(X_test)
+    </div>
 
-mse = mean_squared_error(y_test, y_pred)
-rmse = np.sqrt(mse)
-r2 = r2_score(y_test, y_pred)
+    <script>
+        var app = angular.module('gameApp', []);
 
-print(f'Mean Squared Error (MSE): {mse}')
-print(f'Root Mean Squared Error (RMSE): {rmse}')
-print(f'R-squared (R2): {r2}')
+        app.controller('GameController', function($scope) {
+            $scope.loadGames = function() {
+                $scope.games = [
+                    'Football',
+                    'Basketball',
+                    'Tennis',
+                    'Cricket',
+                    'Baseball'
+                ];
+                $scope.showGames = true;
+            };
+        });
+    </script>
 
-print("Coefficients: ", model.coef_)
-print("Intercept: ", model.intercept_)
-
-Size,Bedrooms,Age,Price
-1500,3,10,400000
-1800,4,5,450000
-2400,4,15,500000
-3000,5,20,600000
-3500,5,10,650000
-4000,6,8,750000
-2200,3,7,480000
-2500,4,12,530000
-2800,4,3,570000
-1900,3,18,420000
+</body>
+</html>
