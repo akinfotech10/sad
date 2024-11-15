@@ -1,48 +1,14 @@
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-from sklearn.cluster import KMeans
-from sklearn.preprocessing import StandardScaler
+const companies = [
+    { id: 1, name: 'Company A', workforce: 25 },
+    { id: 2, name: 'Company B', workforce: 45 },
+    { id: 3, name: 'Company C', workforce: 30 },
+    { id: 4, name: 'Company D', workforce: 50 }
+];
 
-# Step 1: Create a synthetic dataset
-np.random.seed(42)
-data = {
-    'EmployeeID': range(1, 101),
-    'Age': np.random.randint(22, 60, size=100),
-    'Income': np.random.randint(30000, 120000, size=100),
-    'YearsAtCompany': np.random.randint(1, 40, size=100)
+const companyWithLargeWorkforce = companies.find(company => company.workforce > 30);
+
+if (companyWithLargeWorkforce) {
+    console.log('Company found:', companyWithLargeWorkforce);
+} else {
+    console.log('No company found with workforce greater than 30');
 }
-df = pd.DataFrame(data)
-
-# Introduce some missing values for demonstration
-df.loc[5:10, 'Income'] = np.nan
-
-# Step 2: Preprocess the Data
-# Drop rows with missing values
-df.dropna(inplace=True)
-
-# Features for clustering
-features = df[['Age', 'Income', 'YearsAtCompany']]
-
-# Standardize the features
-scaler = StandardScaler()
-features_scaled = scaler.fit_transform(features)
-
-# Step 3: Apply K-means Clustering
-# Choose the number of clusters (k)
-k = 3  # You can adjust this based on your analysis
-kmeans = KMeans(n_clusters=k, random_state=42)
-df['Cluster'] = kmeans.fit_predict(features_scaled)
-
-# Step 4: Visualize the Clusters
-plt.figure(figsize=(10, 6))
-plt.scatter(df['Income'], df['YearsAtCompany'], c=df['Cluster'], cmap='viridis', marker='o')
-plt.title('K-means Clustering of Employees by Income and Years at Company')
-plt.xlabel('Income')
-plt.ylabel('Years at Company')
-plt.colorbar(label='Cluster')
-plt.grid()
-plt.show()
-
-# Display the clustered data
-print(df[['EmployeeID', 'Age', 'Income', 'YearsAtCompany', 'Cluster']])
