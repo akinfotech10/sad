@@ -1,58 +1,83 @@
-interface Car {
-    void assemble();
-}
-
-class BasicCar implements Car {
-    @Override
-    public void assemble() {
-        System.out.println("Basic Car Assembly.");
-    }
-}
-
-class CarDecorator implements Car {
-    protected Car decoratedCar;
-
-    public CarDecorator(Car car) {
-        this.decoratedCar = car;
+<html lang="en" ng-app="employeeApp">
+<head>
+ 
+  <title>Employee Details</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
     }
 
-    @Override
-    public void assemble() {
-        this.decoratedCar.assemble();
-    }
-}
-
-class SportsCar extends CarDecorator {
-    public SportsCar(Car car) {
-        super(car);
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border: 1px solid #ddd;
     }
 
-    @Override
-    public void assemble() {
-        super.assemble();
-        System.out.println("Sports Car Assembly.");
+    th {
+      background-color: #f2f2f2;
     }
-}
+  </style>
+</head>
+<body ng-controller="EmployeeController">
 
-class LuxuryCar extends CarDecorator {
-    public LuxuryCar(Car car) {
-        super(car);
-    }
+  <h2>Employee Details</h2>
 
-    @Override
-    public void assemble() {
-        super.assemble();
-        System.out.println("Luxury Car Assembly.");
-    }
-}
+  <table>
+    <thead>
+      <tr>
+        <th>Employee Name</th>
+        <th>Employee ID</th>
+        <th>Pin Code</th>
+        <th>Address</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="employee in employees">
+        <td>{{ employee.name }}</td>
+        <td>{{ employee.id }}</td>
+        <td>{{ employee.pinCode }}</td>
+        <td>{{ employee.address }}</td>
+      </tr>
+    </tbody>
+  </table>
 
-public class DecoratorPatternTest {
-    public static void main(String[] args) {
-        Car sportsCar = new SportsCar(new BasicCar());
-        sportsCar.assemble();
-        System.out.println("\n*****");
+  <script>
+    var app = angular.module('employeeApp', []);
 
-        Car sportsLuxuryCar = new SportsCar(new LuxuryCar(new BasicCar()));
-        sportsLuxuryCar.assemble();
-    }
-}
+    app.controller('EmployeeController', function($scope) {
+      $scope.employees = [
+        {
+          name: 'John Doe',
+          id: 'E101',
+          pinCode: '110001',
+          address: '123 Main St, New Delhi'
+        },
+        {
+          name: 'Jane Smith',
+          id: 'E102',
+          pinCode: '110002',
+          address: '456 Oak Rd, New Delhi'
+        },
+        {
+          name: 'Mike Johnson',
+          id: 'E103',
+          pinCode: '110003',
+          address: '789 Pine Ave, Gurgaon'
+        },
+        {
+          name: 'Emma Wilson',
+          id: 'E104',
+          pinCode: '110004',
+          address: '101 Maple Blvd, Noida'
+        }
+      ];
+    });
+  </script>
+
+</body>
+</html>
+
+
+
