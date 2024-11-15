@@ -1,28 +1,38 @@
-pip install seaborn
- Write a Python program to prepare Scatter Plot for Iris Dataset. Convert Categorical values in numeric format for a dataset. 
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-from sklearn.datasets import load_iris
-from sklearn.preprocessing import LabelEncoder
+file1.txt:
+Content of file 1
 
-# Step 1: Load the Iris datasetpip 
-iris = load_iris()
-iris_data = pd.DataFrame(iris.data, columns=iris.feature_names)
-iris_data['species'] = iris.target
+file2.txt:
+Content of file 2
 
-# Step 2: Convert categorical 'species' column to numeric using LabelEncoder
-label_encoder = LabelEncoder()
-iris_data['species'] = label_encoder.fit_transform(iris_data['species'])
+file3.txt:
+Content of file 3
 
-# Step 3: Scatter Plot (using sepal length and sepal width as an example)
-plt.figure(figsize=(8, 6))
-sns.scatterplot(data=iris_data, x='sepal length (cm)', y='sepal width (cm)', hue='species', palette='Set1', style='species', s=100)
+const fs = require('fs').promises;
 
-# Customizing the plot
-plt.title("Scatter Plot of Iris Dataset")
-plt.xlabel('Sepal Length (cm)')
-plt.ylabel('Sepal Width (cm)')
+async function readFileAsync(filePath) {
+    try {
+        const data = await fs.readFile(filePath, 'utf-8');
+        return data;
+    } catch (err) {
+        console.error(`Error reading file ${filePath}:`, err);
+        throw err; 
+    }
+}
 
-# Display the plot
-plt.show()
+async function readMultipleFiles() {
+    try {
+        const [file1Data, file2Data, file3Data] = await Promise.all([
+            readFileAsync('file1.txt'),
+            readFileAsync('file2.txt'),
+            readFileAsync('file3.txt')
+        ]);
+
+        console.log('File 1 content:', file1Data);
+        console.log('File 2 content:', file2Data);
+        console.log('File 3 content:', file3Data);
+    } catch (err) {
+        console.error('Error reading one or more files:', err);
+    }
+}
+
+readMultipleFiles();
