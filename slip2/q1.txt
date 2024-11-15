@@ -1,25 +1,69 @@
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error
-data = pd.read_csv('house_data.csv')  
-print("Null values in dataset:\n", data.isnull().sum())
-data = data.dropna()
-X = data[['size', 'bedrooms', 'age']]  
-y = data['price'] 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-model = LinearRegression()
-model.fit(X_train, y_train)
-y_pred = model.predict(X_test)
-mse = mean_squared_error(y_test, y_pred)
-print(f"Mean Squared Error: {mse}")
-comparison = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred})
-print(comparison.head())
+<html lang="en" ng-app="bankApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Details</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+</head>
+<body>
 
+    <div ng-controller="BankController">
 
-size	bedrooms	age	price
-1500	3	10	400000
-1800	4	15	450000
-2400	3	20	500000
-3000	5	5	600000
-3500	4	8	650000
+        <h2>Bank Details</h2>
+        
+        <table border="1" cellpadding="10" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>Bank Name</th>
+                    <th>MICR Code</th>
+                    <th>IFSC Code</th>
+                    <th>Address</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="bank in bankDetails">
+                    <td>{{ bank.name }}</td>
+                    <td>{{ bank.micrCode }}</td>
+                    <td>{{ bank.ifscCode }}</td>
+                    <td>{{ bank.address }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    <script>
+        var app = angular.module('bankApp', []);
+
+        app.controller('BankController', function($scope) {
+            $scope.bankDetails = [
+                {
+                    name: 'State Bank of India',
+                    micrCode: '123456',
+                    ifscCode: 'SBI0001234',
+                    address: 'Mumbai, Maharashtra, India'
+                },
+                {
+                    name: 'HDFC Bank',
+                    micrCode: '654321',
+                    ifscCode: 'HDFC0001234',
+                    address: 'New Delhi, India'
+                },
+                {
+                    name: 'ICICI Bank',
+                    micrCode: '789123',
+                    ifscCode: 'ICIC0001234',
+                    address: 'Chennai, Tamil Nadu, India'
+                },
+                {
+                    name: 'Axis Bank',
+                    micrCode: '456789',
+                    ifscCode: 'AXIS0001234',
+                    address: 'Bangalore, Karnataka, India'
+                }
+            ];
+        });
+    </script>
+
+</body>
+</html>
