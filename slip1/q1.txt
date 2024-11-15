@@ -1,45 +1,49 @@
-import pandas as pd
-import numpy as np
-from mlxtend.frequent_patterns import apriori, association_rules
 
-df = pd.read_csv('groceries.csv')
+<html lang="en" ng-app="myApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AngularJS Addition Example</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+</head>
+<body>
 
-print("Dataset Overview:")
-print(df.head())
+    <div ng-controller="AdditionController" ng-init="num1=0; num2=0;">
+        <h2>AngularJS Addition Example</h2>
 
-frequent_itemsets = apriori(df, min_support=0.25, use_colnames=True)
+        <label for="num1">Enter First Number:</label>
+        <input type="number" id="num1" ng-model="num1">
+        <br><br>
 
-if 'num_itemsets' in association_rules.__code__.co_varnames:
-    rules = association_rules(frequent_itemsets, metric="lift", min_threshold=1, num_itemsets=len(frequent_itemsets))
-else:
-    rules = association_rules(frequent_itemsets, metric="lift", min_threshold=1)
-    
-print("\nFrequent Itemsets (Support >= 0.25):")
-print(frequent_itemsets)
+        <label for="num2">Enter Second Number:</label>
+        <input type="number" id="num2" ng-model="num2">
+        <br><br>
 
-print("\nAssociation Rules:")
-print(rules)
+        <button 
+            ng-click="addNumbers()" 
+            ng-disabled="num1 === '' || num2 === ''"
+            ng-show="num1 !== '' && num2 !== ''">
+            Add Numbers
+        </button>
+        
+        <h3>Sum: <span ng-bind="result"></span></h3>
 
-filtered_rules = rules[rules['lift'] > 2]
-print("\nFiltered Rules (Lift > 2):")
-print(filtered_rules)
+        <div ng-show="num1 === '' || num2 === ''">
+            <p>Please enter both numbers to perform the addition.</p>
+        </div>
+    </div>
 
-import matplotlib.pyplot as plt
-import seaborn as sns
+    <script>
+        var app = angular.module('myApp', []);
 
-plt.figure(figsize=(10, 6))
-sns.barplot(x='lift', y='antecedents', data=filtered_rules.head(10))
-plt.title('Top 10 Association Rules by Lift')
-plt.xlabel('Lift')
-plt.ylabel('Antecedents (Items)')
-plt.show()
+        app.controller('AdditionController', function($scope) {
+            $scope.result = 0;
 
+            $scope.addNumbers = function() {
+                $scope.result = parseFloat($scope.num1) + parseFloat($scope.num2);
+            };
+        });
+    </script>
 
-groceries.csv
-Milk	Bread	Eggs	Cheese
-1	1	0	0
-1	0	1	1
-0	1	1	0
-1	1	0	1
-0	0	1	1
-
+</body>
+</html>
