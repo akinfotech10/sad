@@ -1,1 +1,58 @@
+mkdir employee-api
+cd employee-api
+
+npm init -y
+
+npm install express body-parser
+
+touch app.js
+
+// app.js
+const express = require('express');
+const bodyParser = require('body-parser');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(bodyParser.json());
+
+// In-memory storage for employees (for demonstration purposes)
+let employees = [];
+
+app.post('/employees', (req, res) => {
+    const { id, name, position, salary } = req.body;
+
+    if (!id || !name || !position || !salary) {
+        return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    // Check if employee already exists
+    const existingEmployee = employees.find(emp => emp.id === id);
+    if (existingEmployee) {
+        return res.status(400).json({ error: 'Employee with this ID already exists' });
+    }
+
+    const newEmployee = { id, name, position, salary };
+    employees.push(newEmployee);
+    res.status(201).json({ message: 'Employee created successfully', employee: newEmployee });
+});
+
+app.put('/employees/:id', (req, res) => {
+    const { id } = req.params;
+    const { name, position, salary } = req.body;
+
+    const employeeIndex = employees.findIndex(emp => emp.id === id);
+    if (employeeIndex === -1) {
+        return res.status(404).json({ error: 'Employee not found' });
+    }
+
+    const updatedEmployee = { ...employees[employeeIndex], name, position, salary };
+    employees[employeeIndex] = updatedEmployee;
+
+    res.json({ message: 'Employee updated successfully', employee: updatedEmployee });
+});
+
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+});
 
