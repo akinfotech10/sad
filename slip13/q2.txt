@@ -1,1 +1,59 @@
+npm install -g @angular/cli
 
+ng new input-display-app
+cd input-display-app
+
+ng generate component input-display
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-input-display',
+  templateUrl: './input-display.component.html',
+  styleUrls: ['./input-display.component.css']
+})
+export class InputDisplayComponent {
+  name: string = ''; 
+
+  updateName(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.name = input.value;
+  }
+}
+
+<!-- src/app/input-display/input-display.component.html -->
+<div>
+  <h2>Enter Your Name</h2>
+  <input type="text" [(ngModel)]="name" placeholder="Type your name here" />
+  <p>Your name is: {{ name }}</p>
+</div>
+
+// src/app/app.module.ts
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms'; // Import FormsModule
+
+import { AppComponent } from './app.component';
+import { InputDisplayComponent } from './input-display/input-display.component';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    InputDisplayComponent
+  ],
+  imports: [
+    BrowserModule,
+    FormsModule // Add FormsModule to imports
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+
+<!-- src/app/app.component.html -->
+<app-input-display></app-input-display>
+
+<!-- src/app/app.component.html -->
+<app-input-display></app-input-display>
+
+ng serve
