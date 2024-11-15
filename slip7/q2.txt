@@ -1,66 +1,47 @@
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.naive_bayes import GaussianNB
-from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+const express = require('express');
+const app = express();
 
-df = pd.read_csv('weather.csv')
+app.use(express.json());
 
-print("\nDataset Overview:")
-print(df.head())
+let users = [];
 
-label_encoder = LabelEncoder()
+app.post('/users', (req, res) => {
+  const { name, email, age } = req.body;
 
-df['Outlook'] = label_encoder.fit_transform(df['Outlook'])
-df['Temperature'] = label_encoder.fit_transform(df['Temperature'])
-df['Humidity'] = label_encoder.fit_transform(df['Humidity'])
-df['Wind'] = label_encoder.fit_transform(df['Wind'])
-df['PlayTennis'] = label_encoder.fit_transform(df['PlayTennis'])
+  if (!name || !email || !age) {
+    return res.status(400).json({ error: 'Name, email, and age are required' });
+  }
 
-X = df[['Outlook', 'Temperature', 'Humidity', 'Wind']]  
-y = df['PlayTennis']  
+  const newUser = {
+    id: users.length + 1,  
+    name,
+    email,
+    age
+  };
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+  users.push(newUser);
 
-naive_bayes_model = GaussianNB()
-naive_bayes_model.fit(X_train, y_train)
+  res.status(201).json(newUser);  
+});
 
-y_pred = naive_bayes_model.predict(X_test)
+app.get('/users', (req, res) => {
+  res.status(200).json(users);  /
+});
 
-accuracy = accuracy_score(y_test, y_pred)
-print(f"\nAccuracy: {accuracy * 100:.2f}%")
+app.get('/users/:id', (req, res) => {
+  const userId = parseInt(req.params.id, 10);
 
-print("\nConfusion Matrix:")
-print(confusion_matrix(y_test, y_pred))
+  const user = users.find(u => u.id === userId);
 
-print("\nClassification Report:")
-print(classification_report(y_test, y_pred))
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' });
+  }
 
-new_data = pd.DataFrame({
-    'Outlook': [label_encoder.transform(['Sunny'])[0]],
-    'Temperature': [label_encoder.transform(['Hot'])[0]],
-    'Humidity': [label_encoder.transform(['High'])[0]],
-    'Wind': [label_encoder.transform(['Weak'])[0]]
-})
+  res.status(200).json(user); 
+});
 
-new_prediction = naive_bayes_model.predict(new_data)
-new_prediction = label_encoder.inverse_transform(new_prediction)
-print(f"\nPrediction for new data: Will play tennis? {new_prediction[0]}")
+const port = 3000;
 
-
-
-Outlook,Temperature,Humidity,Wind,PlayTennis
-Sunny,Hot,High,Weak,No
-Sunny,Hot,High,Strong,No
-Overcast,Hot,High,Weak,Yes
-Rain,Mild,High,Weak,Yes
-Rain,Cool,Normal,Weak,Yes
-Rain,Cool,Normal,Strong,No
-Overcast,Cool,Normal,Strong,Yes
-Sunny,Mild,High,Weak,No
-Sunny,Cool,Normal,Weak,Yes
-Rain,Mild,Normal,Weak,Yes
-Sunny,Mild,Normal,Strong,Yes
-Overcast,Mild,High,Strong,Yes
-Overcast,Hot,Normal,Weak,Yes
-Rain,Mild,High,Strong,No
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
+});
