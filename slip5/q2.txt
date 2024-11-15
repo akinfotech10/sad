@@ -1,54 +1,15 @@
+const http = require('http');
 
-pip install numpy pandas scikit-learn matplotlib
+const hostname = '127.0.0.1'; // Localhost
+const port = 3000;            // Port number
 
-import numpy as np
-import pandas as pd
-from sklearn import datasets
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.metrics import classification_report, confusion_matrix
-import matplotlib.pyplot as plt
-import seaborn as sns
+const server = http.createServer((req, res) => {
+  res.statusCode = 200; 
+  res.setHeader('Content-Type', 'text/plain');
 
-# Load the iris dataset
-iris = datasets.load_iris()
-X = iris.data  # features
-y = iris.target  # target labels
+  res.end('Hello, World!\n');
+});
 
-# Convert to DataFrame for better visualization (optional)
-iris_df = pd.DataFrame(data=X, columns=iris.feature_names)
-iris_df['species'] = pd.Categorical.from_codes(y, iris.target_names)
-
-# Split the dataset into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# Feature scaling
-scaler = StandardScaler()
-X_train = scaler.fit_transform(X_train)
-X_test = scaler.transform(X_test)
-
-# Create KNN classifier
-k = 5  # You can change this value to see how it affects the results
-knn = KNeighborsClassifier(n_neighbors=k)
-
-# Train the model
-knn.fit(X_train, y_train)
-
-# Make predictions
-y_pred = knn.predict(X_test)
-
-# Evaluate the model
-print("Confusion Matrix:")
-print(confusion_matrix(y_test, y_pred))
-print("\nClassification Report:")
-print(classification_report(y_test, y_pred))
-
-# Visualize the confusion matrix
-plt.figure(figsize=(8, 6))
-sns.heatmap(confusion_matrix(y_test, y_pred), annot=True, fmt='d', cmap='Blues', 
-            xticklabels=iris.target_names, yticklabels=iris.target_names)
-plt.ylabel('Actual')
-plt.xlabel('Predicted')
-plt.title('Confusion Matrix')
-plt.show()
+server.listen(port, hostname, () => {
+  console.log(`Server running at http://${hostname}:${port}/`);
+});
