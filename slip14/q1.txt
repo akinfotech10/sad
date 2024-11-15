@@ -1,1 +1,48 @@
+npm install -g @angular/cli
 
+ng new student-filter-app
+cd student-filter-app
+
+ng generate component student-list
+
+// src/app/student-list/student-list.component.ts
+import { Component } from '@angular/core';
+
+interface Student {
+  name: string;
+  score: number;
+}
+
+@Component({
+  selector: 'app-student-list',
+  templateUrl: './student-list.component.html',
+  styleUrls: ['./student-list.component.css']
+})
+export class StudentListComponent {
+  students: Student[] = [
+    { name: 'Alice', score: 90 },
+    { name: 'Bob', score: 80 },
+    { name: 'Charlie', score: 85 },
+    { name: 'David', score: 70 },
+    { name: 'Eve', score: 95 }
+  ];
+
+  getHighScorers(): string[] {
+    return this.students
+      .filter(student => student.score >= 85) 
+      .map(student => student.name); 
+  }
+}
+
+<!-- src/app/student-list/student-list.component.html -->
+<div>
+  <h2>Students with 85% and Above</h2>
+  <ul>
+    <li *ngFor="let name of getHighScorers()">{{ name }}</li>
+  </ul>
+</div>
+
+<!-- src/app/app.component.html -->
+<app-student-list></app-student-list>
+
+ng serve
