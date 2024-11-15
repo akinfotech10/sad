@@ -1,1 +1,75 @@
+npm install -g @angular/cli
 
+ng new student-filter-app
+cd student-filter-app
+
+// src/app/student.model.ts
+export interface Student {
+  id: number;
+  name: string;
+  sports: string[];
+}
+
+ng generate service student
+
+// src/app/student.service.ts
+import { Injectable } from '@angular/core';
+import { Student } from './student.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class StudentService {
+  private students: Student[] = [
+    { id: 1, name: 'Alice', sports: ['basketball', 'soccer'] },
+    { id: 2, name: 'Bob', sports: ['football'] },
+    { id: 3, name: 'Charlie', sports: ['basketball', 'tennis'] },
+    { id: 4, name: 'David', sports: ['baseball'] },
+    { id: 5, name: 'Eve', sports: ['basketball'] }
+  ];
+
+  getStudents(): Student[] {
+    return this.students;
+  }
+}
+
+ng generate component student-list
+
+// src/app/student-list/student-list.component.ts
+import { Component, OnInit } from '@angular/core';
+import { StudentService } from '../student.service';
+import { Student } from '../student.model';
+
+@Component({
+  selector: 'app-student-list',
+  templateUrl: './student-list.component.html',
+  styleUrls: ['./student-list.component.css']
+})
+export class StudentListComponent implements OnInit {
+  basketballPlayers: string[] = [];
+
+  constructor(private studentService: StudentService) {}
+
+  ngOnInit(): void {
+    this.getBasketballPlayers();
+  }
+
+  getBasketballPlayers(): void {
+    const students: Student[] = this.studentService.getStudents();
+    this.basketballPlayers = students
+      .filter(student => student.sports.includes('basketball')) // Filter students who play basketball
+      .map(student => student.name); // Map to their names
+  }
+}
+
+<!-- src/app/student-list/student-list.component.html -->
+<h2>Students Who Play Basketball</h2>
+<ul>
+  <li *ngFor="let player of basketballPlayers">{{ player }}</li>
+</ul>
+
+
+<!-- src/app/app.component.html -->
+<app-student-list></app-student-list>
+
+ng serve
